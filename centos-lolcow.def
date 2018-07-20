@@ -1,0 +1,22 @@
+Bootstrap: docker
+From: centos:latest
+
+%post
+    yum -y install epel-release
+    yum -y install fortune-mod
+    yum -y install cowsay
+    yum -y install wget
+    yum -y install ruby
+    yum -y install tar
+    yum -y install gzip
+    wget https://github.com/busyloop/lolcat/archive/v99.9.11.tar.gz
+    tar -xf v99.9.11.tar.gz
+    cd lolcat-99.9.11/bin
+    gem install lolcat
+
+%environment
+    export LC_ALL=C
+
+%runscript
+    fortune | cowsay | lolcat
+

@@ -1,0 +1,68 @@
+Bootstrap: docker
+From: centos:latest
+
+%help
+    Container that illustrates
+       * building from recipe
+       * using a runscript with arguments
+
+%labels
+    maintainer M. Duta
+    version 1.0
+
+%post
+    yum -y install epel-release
+    yum -y install fortune-mod
+    yum -y install cowsay
+    yum -y install wget
+    yum -y install ruby
+    yum -y install tar
+    yum -y install gzip
+    wget https://github.com/busyloop/lolcat/archive/v99.9.11.tar.gz
+    tar -xf v99.9.11.tar.gz
+    cd lolcat-99.9.11/bin
+    gem install lolcat
+
+%environment
+   export LC_ALL=C
+
+%runscript
+    infile=
+    outfile=
+
+    usage() {
+        >&2 echo "Usage:"
+        >&2 echo "$SINGULARITY_NAME -i <infile> -o <outfile> [ -- <cowsay options> ]"
+        exit 1
+    }
+
+    while getopts i:o: argument; do
+        case $argument in
+        i)
+            infile="$OPTARG"
+            ;;
+        o)
+            outfile="$OPTARG"
+            ;;
+        ?)
+            usage
+            ;;
+        esac
+    done
+
+    shift "$((OPTIND - 1))"
+
+    if [ -z "$infile" ]; then
+        usage
+    fi
+
+    if [ -z "$outfile" ]; then
+        cat "$infile" | cowsay "$@" | lolcat
+    else
+        cat "$infile" | cowsay "$@" > "$outfile"
+    fi
+
+%test
+
+    echo "test" | cowsay && echo " *** test: ok"
+
