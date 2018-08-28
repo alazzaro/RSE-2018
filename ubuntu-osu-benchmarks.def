@@ -1,0 +1,61 @@
+BootStrap: docker
+From: ubuntu:16.04
+
+%help
+    Container that runs the MPI OSU suite of micro-benchmarks to illustrate
+      * Singularity integration with and use of MPI
+      * the steps necessary to enable MPI messaging over IB
+
+%labels
+    maintainer M. Duta
+    version 1.0
+
+%post
+    apt-get -y update
+    apt-get -y install wget make
+    apt-get -y install gcc g++
+    apt-get -y install openssh-server
+    apt-get -y install bzip2
+
+
+    #
+    # --- install OpenMPI
+    OPENMPI_VERSION=3.0.0
+    wget https://download.open-mpi.org/release/open-mpi/v3.0/openmpi-${OPENMPI_VERSION}.tar.gz --no-check-certificate --no-check-certificate
+    tar -xf openmpi-${OPENMPI_VERSION}.tar.gz
+    cd openmpi-${OPENMPI_VERSION}/
+    ./configure \
+       --prefix=/opt/openmpi/${OPENMPI_VERSION} \
+       --enable-orterun-prefix-by-default \
+       --enable-mpirun-prefix-by-default
+
+    make -j 2
+    make install
+    cd ../
+    rm -fr openmpi-${OPENMPI_VERSION}*
+
+    #
+    # --- install OSU benchmarks
+    OSU_VERSION=5.4.2
+    wget http://mvapich.cse.ohio-state.edu/download/mvapich/osu-micro-benchmarks-${OSU_VERSION}.tar.gz --no-check-certificate
+    tar -xf osu-micro-benchmarks-${OSU_VERSION}.tar.gz
+    cd osu-micro-benchmarks-${OSU_VERSION}/
+    ./configure \
+       CC=/opt/openmpi/${OPENMPI_VERSION}/bin/mpicc \
+       CXX=/opt/openmpi/${OPENMPI_VERSION}/bin/mpicxx \
+       --prefix=/opt/osu-micro-benchmarks/${OSU_VERSION}/
+    make -j 2
+    make install
+    cd ../
+    rm -fr osu-micro-benchmarks-${OSU_VERSION}*
+
+
+%environment
+    export OPENMPI_VERSION=3.0.0
+    export OSU_VERSION=5.4.2
+    export PATH=/opt/openmpi/${OPENMPI_VERSION}/bin:/opt/osu-micro-benchmarks/${OSU_VERSION}:$PATH
+
+%runscript
+
+%test
+    /opt/openmpi/3.0.0/bin/mpicc -v
