@@ -1,0 +1,51 @@
+Bootstrap: docker
+From: ubuntu:16.04
+
+%help
+    Container that demonstrates Singularity support for MPI. 
+
+%labels
+    maintainer M. Duta
+    version 1.0
+
+%post
+    #
+    # --- install essentials
+    apt-get -y update
+    apt-get -y install wget make
+    apt-get -y install gcc g++
+    apt-get -y install openssh-server
+    apt-get -y install bzip2
+
+    #
+    # --- install OpenMPI
+    OPENMPI_VERSION=3.0.0
+    wget https://download.open-mpi.org/release/open-mpi/v3.0/openmpi-${OPENMPI_VERSION}.tar.gz --no-check-certificate
+    tar -xf openmpi-${OPENMPI_VERSION}.tar.gz
+    cd openmpi-${OPENMPI_VERSION}/
+    ./configure \
+         --prefix=/opt/openmpi/${OPENMPI_VERSION} \
+         --enable-orterun-prefix-by-default \
+         --enable-mpirun-prefix-by-default
+    make -j 2
+    make install
+    cd ../
+    rm -fr openmpi-${OPENMPI_VERSION}*
+
+    #
+    # --- build example executable
+    /opt/openmpi/${OPENMPI_VERSION}/bin/mpicc -o  /usr/local/bin/ring   /usr/local/src/ring.c
+    /opt/openmpi/${OPENMPI_VERSION}/bin/mpicc -o  /usr/local/bin/hello  /usr/local/src/hello.c    
+
+%environment
+    export OPENMPI_VERSION=3.0.0
+    export PATH=/usr/local/bin:/opt/openmpi/${OPENMPI_VERSION}/bin:${PATH}
+
+%files
+    src/ring.c  /usr/local/src
+    src/hello.c /usr/local/src
+
+%runscript
+
+%test
+    /opt/openmpi/3.0.0/bin/mpicc -v
