@@ -1,0 +1,27 @@
+Bootstrap: docker
+From: ubuntu:16.04
+
+%help
+    Container that demonstrates (simple) Singularity support for Nvidia GPUs
+
+%labels
+    maintainer A.Gittings
+    version 1.0
+
+%post
+
+    # Install build essentials
+    apt-get -y update
+    apt-get -y install wget build-essential
+
+    # Install Nvidia repo
+    apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+    wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_9.2.148-1_amd64.deb
+    dpkg -i cuda-repo-ubuntu1604_9.2.148-1_amd64.deb
+
+    # Install CUDA
+    apt-get update
+    apt-get -y install cuda
+
+%runscript
+    nvidia-smi
