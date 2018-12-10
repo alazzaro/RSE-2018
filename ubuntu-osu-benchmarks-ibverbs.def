@@ -23,6 +23,23 @@ From: ubuntu:16.04
     apt-get install -y pciutils
 
     # basic drivers for user-space access to IB and Ethernet
+    #  * ibutils -- set of utilities useful for diagnosing and testing InfiniBand based networks
+    #  * ibverbs* -- library that allows userspace processes to use RDMA "verbs"
+    #  * ibacm -- provides a framework for name, address, and route resolution services over InfiniBand
+    #       (intended to address connection setup scalability issues running MPI applications on large clusters)
+    #  * rdmacm*,librdmacm* -- library that allows applications to set up reliable connected and unreliable datagram transfers
+    #       when using RDMA adapters (transport-neutral interface, same code can be used for both IB and iWARP adapters)
+    #  * infiniband-diags -- diagnostic programs and scripts needed to diagnose an InfiniBand subnet
+    #  * perftest -- tests written using Infiniband verbs intended for use as a performance micro-benchmark
+    #  * libibcm.* -- userspace implementation of an InfiniBand Communication Manager (CM)
+    #  * libibmad.* -- low layer IB functions for use by the InfiniBand diagnostic and management programs
+    #  * libibumad* -- IB userspace Management Datagram (uMAD) library
+    #  * libnuma* -- NUMA (Non-Uniform Memory Architecture) scheduling or memory placement policies
+    #  * dkms -- framework to allow individual kernel modules to be upgraded without changing the whole kernel
+    #  * mstflint -- contains a burning tool and diagnostic tools for Mellanox manufactured HCA/NIC cards
+    #  * opensm -- implementation of an IB Subnet Manager (SM) and Administrator (SA)
+    #  * srptools -- allows you to discover and use Infiniband attached storage devices which use the SCSI RDMA Protocol (SRP)
+    #  * vlan -- user mode programs you need to add and remove VLAN devices from your ethernet devices
     apt-get install -y ibutils ibverbs-utils libibverbs* libibverbs-dev \
                        rdmacm-utils infiniband-diags perftest \
                        ibacm libibcm.* librdmacm* librdmacm-dev \
@@ -31,6 +48,8 @@ From: ubuntu:16.04
                        dkms mstflint opensm srptools vlan
 
     # important: use libnl3
+    #  * libnl3 -- a library for applications dealing with netlink sockets,
+    #       provides an interface for raw netlink messaging and various netlink family specific interfaces
     apt-get install -y libnl-3-200 libnl-route-3-200 libnl-route-3-dev libnl-utils
 
     # add modules to kernel
